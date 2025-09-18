@@ -1,5 +1,6 @@
 import inspect
 
+
 def convert_type(value, to_type):
     if to_type == bool:
         if isinstance(value, str):
@@ -9,6 +10,7 @@ def convert_type(value, to_type):
         return to_type(value)
     except (ValueError, TypeError):
         raise ValueError(f"Cannot convert {value} to {to_type}")
+
 
 def inject_params(func, req):
     sig = inspect.signature(func)

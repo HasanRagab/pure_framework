@@ -9,74 +9,65 @@ from .framework_types import RouteInfo, HTTPMethod
 
 class OpenAPIGenerator:
     """Simple OpenAPI 3.0 specification generator."""
-    
+
     def __init__(self, title: str = "Pure Framework API", version: str = "1.0.0") -> None:
         """
         Initialize the generator.
-        
+
         Args:
             title: API title
             version: API version
         """
         self.title = title
         self.version = version
-    
+
     def generate(self, routes: List[RouteInfo]) -> Dict[str, Any]:
         """
         Generate OpenAPI specification.
-        
+
         Args:
             routes: List of route information
-            
+
         Returns:
             OpenAPI specification dictionary
         """
         paths: Dict[str, Any] = {}
-        
+
         for route in routes:
             path = route.path
             if path not in paths:
                 paths[path] = {}
-            
+
             for method in route.methods:
                 method_lower = method.value.lower()
                 paths[path][method_lower] = {
                     "summary": route.name,
                     "description": route.description or f"{method.value} {path}",
                     "responses": {
-                        "200": {
-                            "description": "Success"
-                        },
-                        "404": {
-                            "description": "Not Found"
-                        },
-                        "500": {
-                            "description": "Internal Server Error"
-                        }
-                    }
+                        "200": {"description": "Success"},
+                        "404": {"description": "Not Found"},
+                        "500": {"description": "Internal Server Error"},
+                    },
                 }
-        
+
         return {
             "openapi": "3.0.0",
-            "info": {
-                "title": self.title,
-                "version": self.version
-            },
-            "paths": paths
+            "info": {"title": self.title, "version": self.version},
+            "paths": paths,
         }
-    
+
     def generate_swagger_ui(self, openapi_spec: Dict[str, Any]) -> str:
         """
         Generate Swagger UI HTML.
-        
+
         Args:
             openapi_spec: OpenAPI specification
-            
+
         Returns:
             HTML content for Swagger UI
         """
         spec_json = json.dumps(openapi_spec, indent=2)
-        
+
         return f"""
 <!DOCTYPE html>
 <html>
