@@ -46,11 +46,11 @@ class BaseMiddleware(IMiddleware, ABC):
     """Base class for middleware implementations."""
 
     @abstractmethod
-    def process(self, request: IRequest, response: IResponse) -> None:
+    def process(self, req: IRequest, res: IResponse) -> None:
         """Process the request/response."""
         pass
 
-    def on_error(self, error: Exception, request: IRequest, response: IResponse) -> bool:
+    def on_error(self, error: Exception, req: IRequest, res: IResponse) -> bool:
         """
         Handle errors that occur during processing.
 
@@ -68,10 +68,10 @@ class BaseMiddleware(IMiddleware, ABC):
 class AsyncMiddleware(BaseMiddleware):
     """Base class for async middleware (placeholder for future async support)."""
 
-    def process(self, request: IRequest, response: IResponse) -> None:
+    def process(self, req: IRequest, res: IResponse) -> None:
         """Sync wrapper for async processing."""
         # For now, delegate to sync method
-        self.process_sync(request, response)
+        self.process_sync(req, res)
 
     @abstractmethod
     def process_sync(self, request: IRequest, response: IResponse) -> None:
@@ -263,9 +263,9 @@ class LoggingMiddleware(BaseMiddleware):
         """
         self._logger = logger or print
 
-    def process(self, request: IRequest, response: IResponse) -> None:
+    def process(self, req: IRequest, res: IResponse) -> None:
         """Log the request."""
-        self._logger(f"{request.method.value} {request.path}")
+        self._logger(f"{req.method.value} {req.path}")
 
 
 class CorsMiddleware(BaseMiddleware):
@@ -292,18 +292,18 @@ class CorsMiddleware(BaseMiddleware):
         self.headers = headers or ["Content-Type", "Authorization"]
         self.allow_credentials = allow_credentials
 
-    def process(self, request: IRequest, response: IResponse) -> None:
+    def process(self, req: IRequest, res: IResponse) -> None:
         """Add CORS headers."""
-        origin = request.get_header("origin")
+        origin = req.get_header("origin")
 
         if self._is_origin_allowed(origin):
-            response.set_header("Access-Control-Allow-Origin", origin or "*")
+            res.set_header("Access-Control-Allow-Origin", origin or "*")
 
-        response.set_header("Access-Control-Allow-Methods", ", ".join(self.methods))
-        response.set_header("Access-Control-Allow-Headers", ", ".join(self.headers))
+        res.set_header("Access-Control-Allow-Methods", ", ".join(self.methods))
+        res.set_header("Access-Control-Allow-Headers", ", ".join(self.headers))
 
         if self.allow_credentials:
-            response.set_header("Access-Control-Allow-Credentials", "true")
+            res.set_header("Access-Control-Allow-Credentials", "true")
 
     def _is_origin_allowed(self, origin: Optional[str]) -> bool:
         """Check if origin is allowed."""
@@ -316,25 +316,25 @@ class CorsMiddleware(BaseMiddleware):
 class SecurityHeadersMiddleware(BaseMiddleware):
     """Middleware for adding security headers."""
 
-    def process(self, request: IRequest, response: IResponse) -> None:
+    def process(self, req: IRequest, res: IResponse) -> None:
         """Add security headers."""
-        response.set_header("X-Content-Type-Options", "nosniff")
-        response.set_header("X-Frame-Options", "DENY")
-        response.set_header("X-XSS-Protection", "1; mode=block")
-        response.set_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        res.set_header("X-Content-Type-Options", "nosniff")
+        res.set_header("X-Frame-Options", "DENY")
+        res.set_header("X-XSS-Protection", "1; mode=block")
+        res.set_header("Referrer-Policy", "strict-origin-when-cross-origin")
 
 
 class CompressionMiddleware(BaseMiddleware):
     """Middleware for response compression (placeholder)."""
 
-    def process(self, request: IRequest, response: IResponse) -> None:
+    def process(self, req: IRequest, res: IResponse) -> None:
         """Add compression headers."""
-        accept_encoding = request.get_header("accept-encoding", "")
+        accept_encoding = req.get_header("accept-encoding", "")
 
         if accept_encoding and "gzip" in accept_encoding:
-            response.set_header("Content-Encoding", "gzip")
+            res.set_header("Content-Encoding", "gzip")
         elif accept_encoding and "deflate" in accept_encoding:
-            response.set_header("Content-Encoding", "deflate")
+            res.set_header("Content-Encoding", "deflate")
 
 
 # Built-in guard implementations

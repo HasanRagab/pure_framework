@@ -150,7 +150,7 @@ class IResponse(Protocol):
 class IMiddleware(Protocol):
     """Protocol for middleware components."""
 
-    def process(self, request: IRequest, response: IResponse) -> None:
+    def process(self, req: IRequest, res: IResponse) -> None:
         """Process the request/response through middleware."""
         ...
 

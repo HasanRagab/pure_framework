@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 # Project metadata and configuration
 [project]
 name = "pure-framework"
-version = "0.0.3"
+version = "0.0.3.5"
 description = "A modern, lightweight Python web framework with type safety, dependency injection, middleware pipelines, and auto-generated API documentation."
 authors = [
     { name = "Hasan Ragab", email = "hr145310@gmail.com" },

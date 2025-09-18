@@ -126,8 +126,10 @@ def route(
         else:
             # Controller method - store for later registration
             if not hasattr(func, "_route_info"):
-                func._route_info = []  # type: ignore
-            func._route_info.append(route_info)  # type: ignore
+                setattr(func, "_route_info", [])
+            route_list = getattr(func, "_route_info", [])
+            route_list.append(route_info)
+            setattr(func, "_route_info", route_list)
 
         return func
 
@@ -267,7 +269,7 @@ def controller(
         )
 
         # Store metadata on the class
-        cls.__controller_metadata__ = metadata  # type: ignore
+        setattr(cls, "__controller_metadata__", metadata)
 
         # Register controller
         RouteRegistry.add_controller(cls, metadata)
@@ -293,8 +295,10 @@ def middleware(*middleware_classes: Type[IMiddleware]) -> Callable[[F], F]:
 
     def decorator(func: F) -> F:
         if not hasattr(func, "_middleware_classes"):
-            func._middleware_classes = []  # type: ignore
-        func._middleware_classes.extend(middleware_classes)  # type: ignore
+            setattr(func, "_middleware_classes", [])
+        middleware_list = getattr(func, "_middleware_classes", [])
+        middleware_list.extend(middleware_classes)
+        setattr(func, "_middleware_classes", middleware_list)
         return func
 
     return decorator
@@ -313,8 +317,10 @@ def guard(*guard_classes: Type[IGuard]) -> Callable[[F], F]:
 
     def decorator(func: F) -> F:
         if not hasattr(func, "_guard_classes"):
-            func._guard_classes = []  # type: ignore
-        func._guard_classes.extend(guard_classes)  # type: ignore
+            setattr(func, "_guard_classes", [])
+        guard_list = getattr(func, "_guard_classes", [])
+        guard_list.extend(guard_classes)
+        setattr(func, "_guard_classes", guard_list)
         return func
 
     return decorator
@@ -333,7 +339,7 @@ def validate_json(schema: Dict[str, Any]) -> Callable[[F], F]:
 
     def decorator(func: F) -> F:
         # Store schema for later use
-        func._json_schema = schema  # type: ignore
+        setattr(func, "_json_schema", schema)
         return func
 
     return decorator
@@ -491,15 +497,17 @@ def api_response(
 
     def decorator(func: F) -> F:
         if not hasattr(func, "_api_responses"):
-            func._api_responses = []  # type: ignore
+            setattr(func, "_api_responses", [])
 
-        func._api_responses.append(
-            {  # type: ignore
+        api_responses = getattr(func, "_api_responses", [])
+        api_responses.append(
+            {
                 "status_code": status_code,
                 "description": description,
                 "content_type": content_type,
             }
         )
+        setattr(func, "_api_responses", api_responses)
 
         return func
 
@@ -518,8 +526,8 @@ def deprecated(reason: str = "") -> Callable[[F], F]:
     """
 
     def decorator(func: F) -> F:
-        func._deprecated = True  # type: ignore
-        func._deprecation_reason = reason  # type: ignore
+        setattr(func, "_deprecated", True)
+        setattr(func, "_deprecation_reason", reason)
         return func
 
     return decorator
