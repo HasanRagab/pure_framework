@@ -1,0 +1,219 @@
+# Build system configuration
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+# Project metadata and configuration
+[project]
+name = "pure-framework"
+version = "0.0.3"
+description = "A modern, lightweight Python web framework with type safety, dependency injection, middleware pipelines, and auto-generated API documentation."
+authors = [
+    { name = "Hasan Ragab", email = "hr145310@gmail.com" },
+]
+maintainers = [
+    { name = "Hasan Ragab", email = "hr145310@gmail.com" },
+]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+
+# Dependencies
+dependencies = []
+
+# Keywords for PyPI discovery
+keywords = [
+    "web-framework",
+    "rest-api",
+    "microservice",
+    "http-server",
+    "dependency-injection",
+    "middleware",
+    "type-safety",
+    "swagger",
+    "openapi",
+    "pure-python",
+    "lightweight",
+    "modern"
+]
+
+# PyPI classifiers
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Networking",
+    "Typing :: Typed",
+]
+
+# Optional dependencies for different use cases
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "flake8>=5.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=2.20.0",
+    "twine>=4.0.0",
+    "build>=0.8.0",
+]
+docs = [
+    "mkdocs>=1.4.0",
+    "mkdocs-material>=8.5.0",
+    "mkdocstrings[python]>=0.19.0",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.24.0",
+]
+
+# Project URLs
+[project.urls]
+Homepage = "https://github.com/hasanragab/pure_framework"
+Documentation = "https://github.com/hasanragab/pure_framework#readme"
+Repository = "https://github.com/hasanragab/pure_framework"
+"Bug Tracker" = "https://github.com/hasanragab/pure_framework/issues"
+"Source Code" = "https://github.com/hasanragab/pure_framework"
+Changelog = "https://github.com/hasanragab/pure_framework/blob/main/CHANGELOG.md"
+Funding = "https://github.com/sponsors/hasanragab"
+
+# CLI entry points (if any in the future)
+[project.scripts]
+# pure-framework = "pure_framework.cli:main"
+
+# Package discovery and inclusion
+[tool.setuptools]
+package-dir = {"" = "."}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pure_framework*"]
+exclude = ["tests*", "docs*", "examples*"]
+
+# Additional package data
+[tool.setuptools.package-data]
+pure_framework = ["py.typed"]
+
+# Development tools configuration
+
+# Black code formatter
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+# isort import sorter
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+combine_as_imports = true
+known_first_party = ["pure_framework"]
+
+# MyPy type checker
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=pure_framework",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["pure_framework"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Bandit security linter
+[tool.bandit]
+exclude_dirs = ["tests", "build", "dist"]
+tests = ["B201", "B301"]
+skips = ["B101", "B601"]
