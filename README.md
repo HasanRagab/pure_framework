@@ -512,8 +512,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - 📧 Email: hr145310@gmail.com
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/pure_framework/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/pure_framework/discussions)
+- 🐛 Issues: [GitHub Issues](https://github.com/hasanragab/pure_framework/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/hasanragab/pure_framework/discussions)
 
 ---
 
