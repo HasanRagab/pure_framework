@@ -513,8 +513,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 📧 Email: hr145310@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/hasanragab/pure_framework/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/hasanragab/pure_framework/discussions)
-
 ---
 
 Made with ❤️ by [Hasan Ragab](mailto:hr145310@gmail.com)
