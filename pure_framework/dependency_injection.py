@@ -191,16 +191,20 @@ class DependencyContainer(IDependencyContainer):
         except Exception as e:
             raise DependencyResolutionError(f"Failed to resolve {interface.__name__}: {e}")
 
+    def _detect_circular_dependency(self, interface: Type[T]) -> Optional[str]:
+        """Detect circular dependencies and return error message if found."""
+        if interface in self._resolution_stack:
+            cycle = " -> ".join([t.__name__ for t in self._resolution_stack])
+            return f"Circular dependency detected: {cycle} -> {interface.__name__}"
+        return None
+
     def _resolve_internal(self, interface: Type[T], name: Optional[str] = None) -> T:
         """Internal resolution logic with circular dependency detection."""
 
         # Check for circular dependencies
-        if interface in self._resolution_stack:
-            cycle = (
-                " -> ".join([t.__name__ for t in self._resolution_stack])
-                + f" -> {interface.__name__}"
-            )
-            raise DependencyResolutionError(f"Circular dependency detected: {cycle}")
+        circular_error = self._detect_circular_dependency(interface)
+        if circular_error:
+            raise DependencyResolutionError(circular_error)
 
         # Look up dependency info
         dependency_info = None

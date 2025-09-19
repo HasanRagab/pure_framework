@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 # Project metadata and configuration
 [project]
 name = "pure-framework"
-version = "0.0.3.5"
-description = "A modern, lightweight Python web framework with type safety, dependency injection, middleware pipelines, and auto-generated API documentation."
+version = "0.0.4"
+description = "A modern, lightweight Python web framework with type safety, dependency injection, middleware pipelines, async support, request validation, enhanced error handling, and auto-generated API documentation."
 authors = [
     { name = "Hasan Ragab", email = "hr145310@gmail.com" },
 ]
@@ -34,7 +34,13 @@ keywords = [
     "openapi",
     "pure-python",
     "lightweight",
-    "modern"
+    "modern",
+    "async",
+    "asyncio",
+    "validation",
+    "error-handling",
+    "testing",
+    "cli-tool"
 ]
 
 # PyPI classifiers
@@ -86,19 +92,17 @@ test = [
     "httpx>=0.24.0",
 ]
 
-# Project URLs
+# URLs for project
 [project.urls]
-Homepage = "https://github.com/hasanragab/pure_framework"
-Documentation = "https://github.com/hasanragab/pure_framework#readme"
-Repository = "https://github.com/hasanragab/pure_framework"
-"Bug Tracker" = "https://github.com/hasanragab/pure_framework/issues"
-"Source Code" = "https://github.com/hasanragab/pure_framework"
-Changelog = "https://github.com/hasanragab/pure_framework/blob/main/CHANGELOG.md"
-Funding = "https://github.com/sponsors/hasanragab"
+Homepage = "https://github.com/HasanRagab/pure_framework"
+Documentation = "https://github.com/HasanRagab/pure_framework#readme"
+Repository = "https://github.com/HasanRagab/pure_framework.git"
+Issues = "https://github.com/HasanRagab/pure_framework/issues"
+Changelog = "https://github.com/HasanRagab/pure_framework/blob/main/CHANGELOG.md"
 
-# CLI entry points (if any in the future)
+# CLI scripts
 [project.scripts]
-# pure-framework = "pure_framework.cli:main"
+pure = "pure_framework.cli:main"
 
 # Package discovery and inclusion
 [tool.setuptools]

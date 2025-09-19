@@ -32,8 +32,11 @@ Headers = Dict[str, str]
 QueryParams = Dict[str, Union[str, List[str]]]
 PathParams = Dict[str, str]
 RouteHandler = Callable[..., Any]
+AsyncRouteHandler = Callable[..., Awaitable[Any]]
 MiddlewareFunction = Callable[["IRequest", "IResponse"], None]
+AsyncMiddlewareFunction = Callable[["IRequest", "IResponse"], Awaitable[None]]
 GuardFunction = Callable[["IRequest"], bool]
+AsyncGuardFunction = Callable[["IRequest"], Awaitable[bool]]
 
 
 # HTTP Method enumeration
@@ -154,6 +157,23 @@ class IMiddleware(Protocol):
         """Process the request/response through middleware."""
         ...
 
+    def on_error(self, error: Exception, req: IRequest, res: IResponse) -> bool:
+        """Handle errors in middleware. Return True if error was handled."""
+        return False
+
+
+@runtime_checkable
+class IAsyncMiddleware(Protocol):
+    """Protocol for async middleware components."""
+
+    async def process(self, req: IRequest, res: IResponse) -> None:
+        """Process the request/response through async middleware."""
+        ...
+
+    async def on_error(self, error: Exception, req: IRequest, res: IResponse) -> bool:
+        """Handle errors in async middleware. Return True if error was handled."""
+        return False
+
 
 @runtime_checkable
 class IGuard(Protocol):
@@ -163,6 +183,25 @@ class IGuard(Protocol):
         """Determine if the request can proceed."""
         ...
 
+    def on_deny(self, request: IRequest, response: IResponse) -> None:
+        """Handle access denial."""
+        response.status_code = 403
+        response.json({"error": "Forbidden", "message": "Access denied", "status_code": 403})
+
+
+@runtime_checkable
+class IAsyncGuard(Protocol):
+    """Protocol for async guard components."""
+
+    async def can_activate(self, request: IRequest) -> bool:
+        """Determine if the request can proceed (async)."""
+        ...
+
+    async def on_deny(self, request: IRequest, response: IResponse) -> None:
+        """Handle access denial (async)."""
+        response.status_code = 403
+        response.json({"error": "Forbidden", "message": "Access denied", "status_code": 403})
+
 
 class RouteInfo:
     """Immutable data class representing a route configuration."""
@@ -171,10 +210,10 @@ class RouteInfo:
         self,
         path: str,
         methods: List[HTTPMethod],
-        handler: RouteHandler,
+        handler: Union[RouteHandler, AsyncRouteHandler],
         controller_class: Optional[Type[Any]] = None,
-        middlewares: Optional[List[IMiddleware]] = None,
-        guards: Optional[List[IGuard]] = None,
+        middlewares: Optional[List[Union[IMiddleware, IAsyncMiddleware]]] = None,
+        guards: Optional[List[Union[IGuard, IAsyncGuard]]] = None,
         name: Optional[str] = None,
         description: Optional[str] = None,
     ) -> None:
@@ -196,7 +235,7 @@ class RouteInfo:
         return self._methods
 
     @property
-    def handler(self) -> RouteHandler:
+    def handler(self) -> Union[RouteHandler, AsyncRouteHandler]:
         return self._handler
 
     @property
@@ -204,11 +243,11 @@ class RouteInfo:
         return self._controller_class
 
     @property
-    def middlewares(self) -> Tuple[IMiddleware, ...]:
+    def middlewares(self) -> Tuple[Union[IMiddleware, IAsyncMiddleware], ...]:
         return self._middlewares
 
     @property
-    def guards(self) -> Tuple[IGuard, ...]:
+    def guards(self) -> Tuple[Union[IGuard, IAsyncGuard], ...]:
         return self._guards
 
     @property
@@ -262,6 +301,12 @@ class IDependencyContainer(Protocol):
         """Register a dependency."""
         ...
 
+    def register_type(
+        self, interface: Type[T], implementation: Union[Type[T], T], lifecycle: Any = None
+    ) -> "IDependencyContainer":
+        """Register a type dependency."""
+        ...
+
     def resolve(self, interface: Type[T]) -> T:
         """Resolve a dependency."""
         ...
@@ -308,6 +353,11 @@ class ApplicationConfig:
         api_version: str = "1.0.0",
         cors_enabled: bool = False,
         cors_origins: Optional[List[str]] = None,
+        log_level: str = "INFO",
+        max_request_size: int = 1024 * 1024 * 10,  # 10MB
+        request_timeout: int = 30,
+        enable_security_headers: bool = True,
+        enable_request_logging: bool = True,
     ) -> None:
         self.host = host
         self.port = port
@@ -318,17 +368,22 @@ class ApplicationConfig:
         self.api_version = api_version
         self.cors_enabled = cors_enabled
         self.cors_origins = cors_origins or ["*"]
+        self.log_level = log_level
+        self.max_request_size = max_request_size
+        self.request_timeout = request_timeout
+        self.enable_security_headers = enable_security_headers
+        self.enable_request_logging = enable_request_logging
 
 
 @runtime_checkable
 class IApplication(Protocol):
     """Protocol for the main application."""
 
-    def add_middleware(self, middleware: IMiddleware) -> "IApplication":
+    def add_middleware(self, middleware: Union[IMiddleware, IAsyncMiddleware]) -> "IApplication":
         """Add global middleware."""
         ...
 
-    def add_guard(self, guard: IGuard) -> "IApplication":
+    def add_guard(self, guard: Union[IGuard, IAsyncGuard]) -> "IApplication":
         """Add global guard."""
         ...
 
@@ -336,7 +391,7 @@ class IApplication(Protocol):
         """Register a controller."""
         ...
 
-    def run(self, config: Optional[ApplicationConfig] = None) -> None:
+    def run(self, host: Optional[str] = None, port: Optional[int] = None) -> None:
         """Start the application."""
         ...
 

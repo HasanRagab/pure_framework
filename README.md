@@ -4,10 +4,11 @@ A lightweight, modern Python web framework built with type safety, dependency in
 
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.0.3-orange.svg)](pyproject.toml)
+[![Version](https://img.shields.io/badge/version-0.0.4-orange.svg)](pyproject.toml)
 
 ## ✨ Features
 
+### Core Framework
 - **🔒 Full Type Safety**: Built with Python protocols and generics for comprehensive type checking
 - **💉 Advanced Dependency Injection**: Automatic parameter resolution with singleton, transient, and scoped lifecycles
 - **🔄 Pipeline-based Middleware**: Chain of responsibility pattern with error handling
@@ -18,7 +19,16 @@ A lightweight, modern Python web framework built with type safety, dependency in
 - **🏗️ SOLID Principles**: Clean separation of concerns and maintainable architecture
 - **🐍 Pure Python**: No external dependencies, works with standard library only
 
-## 🚀 Quick Start
+### New in v0.0.4
+- **⚡ Async/Await Support**: Full async support with AsyncPureFramework for modern Python applications
+- **✅ Request/Response Validation**: Pydantic-style validation with detailed error messages
+- **�️ Enhanced Error Handling**: Structured error responses with proper HTTP status codes
+- **🧪 Test Client**: Comprehensive testing utilities for easy unit and integration testing
+- **⚙️ CLI Tool**: Command-line interface for project scaffolding and development
+- **🔗 Advanced Middleware**: Support for both sync and async middleware pipelines
+- **🛡️ Enhanced Guards**: Async guards with rate limiting and authorization patterns
+
+## �🚀 Quick Start
 
 ### Installation
 
@@ -47,6 +57,56 @@ def get_user(req: IRequest, res: IResponse, id: int) -> None:
 def create_user(req: IRequest, res: IResponse) -> None:
     user_data = req.json
     res.json({'created': user_data}, status_code=201)
+
+if __name__ == "__main__":
+    app.run()
+```
+
+### Async Example
+
+```python
+from pure_framework import AsyncPureFramework, async_get, async_post
+from pure_framework.framework_types import IRequest, IResponse
+import asyncio
+
+app = AsyncPureFramework()
+
+@async_get('/hello')
+async def hello_world(req: IRequest, res: IResponse) -> None:
+    # Simulate async work
+    await asyncio.sleep(0.01)
+    res.json({'message': 'Hello from async!', 'type': 'async'})
+
+@async_post('/process')
+async def process_data(req: IRequest, res: IResponse) -> None:
+    # Async data processing
+    data = req.json
+    await asyncio.sleep(0.1)  # Simulate async processing
+    res.json({'processed': data, 'status': 'completed'})
+
+if __name__ == "__main__":
+    app.run_async()
+```
+
+### CLI Usage
+
+Create a new project:
+```bash
+pure new my-api                    # Basic API project
+pure new my-async-api --template async-api  # Async API project
+```
+
+Run your project:
+```bash
+pure run                           # Run the current project
+pure run --reload                  # Run with auto-reload
+```
+
+Run tests:
+```bash
+pure test                          # Run all tests
+pure test --verbose                # Verbose output
+```
 
 if __name__ == '__main__':
     app.run()  # Starts server at http://127.0.0.1:8000
